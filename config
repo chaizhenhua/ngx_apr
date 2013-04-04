@@ -1,0 +1,5 @@
+ngx_addon_name=ngx_http_apr
+HTTP_AUX_FILTER_MODULES="ngx_http_apr $HTTP_AUX_FILTER_MODULES"
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_apr.c"
+CORE_LIBS="$CORE_LIBS -L/usr/local/apr/lib -lapr-1  -L/usr/local/apr/lib -laprutil-1 "
+CORE_INCS="$CORE_INCS $ngx_addon_dir /usr/local/apr/include/apr-1"
