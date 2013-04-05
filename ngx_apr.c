@@ -5,7 +5,6 @@
 #include <apr.h>
 
 static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf);
-static void ngx_http_apr_exit_process(ngx_cycle_t *cycle);
 
 /*
 ** handlers for configuration phases of the module
@@ -36,20 +35,28 @@ ngx_module_t ngx_http_apr = {
     NULL, /* init process */
     NULL, /* init thread */
     NULL, /* exit thread */
-    ngx_http_apr_exit_process, /* exit process */
-    ngx_http_apr_exit_process, /* exit master */
+    NULL, /* exit process */
+    NULL, /* exit master */
     NGX_MODULE_V1_PADDING
 };
 
-static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf) {
-    apr_initialize();
-    return NGX_OK;
-}
-
-
-static void ngx_http_apr_exit_process(ngx_cycle_t *cycle) {
+static void ngx_http_apr_terminate(void *dummy) {
     apr_terminate();
 }
 
+static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf) {
+    ngx_pool_cleanup_t *cln;
 
+    apr_initialize();
+
+    cln = ngx_pool_cleanup_add(cf->pool, 0);
+
+    if (cln == NULL) {
+        return NGX_ERROR;
+    }
+
+    cln->handler = ngx_http_apr_terminate;
+
+    return NGX_OK;
+}
 
