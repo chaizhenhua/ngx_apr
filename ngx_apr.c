@@ -35,14 +35,14 @@ ngx_module_t ngx_http_apr = {
     NULL, /* init process */
     NULL, /* init thread */
     NULL, /* exit thread */
-    NULL, /* exit process */
-    NULL, /* exit master */
     NGX_MODULE_V1_PADDING
 };
+
 
 static void ngx_http_apr_terminate(void *dummy) {
     apr_terminate();
 }
+
 
 static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf) {
     ngx_pool_cleanup_t *cln;
@@ -58,5 +58,16 @@ static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf) {
     cln->handler = ngx_http_apr_terminate;
 
     return NGX_OK;
+}
+
+
+static ngx_int_t ngx_http_apr_preconfiguration(ngx_conf_t *cf) {
+    apr_initialize();
+    return NGX_OK;
+}
+
+
+static void ngx_http_apr_exit_process(ngx_cycle_t *cycle) {
+    apr_terminate();
 }
 
